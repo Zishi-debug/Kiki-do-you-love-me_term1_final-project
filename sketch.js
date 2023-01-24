@@ -57,11 +57,15 @@ function setup() {
   frameRate(10);
   createElement('h1', 'Tell me something you afraid to speak to others');
   createCanvas(1800,1200, WEBGL);
-  angleMode(DEGREES);
-  smooth();
-  noStroke();
-  modelDisplay = 0;
   
+ 
+  //background
+  background(255);
+  push();
+  texture(bg);
+  plane(windowWidth, windowHeight);
+  pop();
+
   numIters = 10;
   spc = 595 / numIters;
   a = spc / 2;
@@ -80,19 +84,19 @@ function setup() {
   video.size(width, height);
   poseNet = ml5.poseNet(video, modelReady);
   setTimeout(detectPose, 4000);
-  noseX = width / 2;
-  noseY = height / 2;
+  
   video.hide();
   statusPrompt = createElement('h2', 'Loading...');
 
-  //background
-  background(255);
-  push();
-  texture(bg);
-  plane(windowWidth, windowHeight);
-  pop();
-  
+  angleMode(DEGREES);
+  smooth();
+  noStroke();
+  modelDisplay = 0;
+
+  noseX = width / 2;
+  noseY = height / 2;
 }
+
 
 function draw() {
   //the default models in the middle(when you say I love you,I miss you...)
