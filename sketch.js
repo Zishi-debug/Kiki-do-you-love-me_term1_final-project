@@ -11,6 +11,7 @@ let range = 100;
 let offsetX = 0;
 let video, poseNet;
 let poses = [];
+let pose;
 let noseX, noseY;
 
 let trumpet;
@@ -57,15 +58,11 @@ function setup() {
   frameRate(10);
   createElement('h1', 'Tell me something you afraid to speak to others');
   createCanvas(1800,1200, WEBGL);
+  angleMode(DEGREES);
+  smooth();
+  noStroke();
+  modelDisplay = 0;
   
- 
-  //background
-  background(255);
-  push();
-  texture(bg);
-  plane(windowWidth, windowHeight);
-  pop();
-
   numIters = 10;
   spc = 595 / numIters;
   a = spc / 2;
@@ -83,20 +80,31 @@ function setup() {
   video = createCapture(VIDEO);
   video.size(width, height);
   poseNet = ml5.poseNet(video, modelReady);
-  setTimeout(detectPose, 4000);
+  poseNet.on('pose', gotPoses);
   
+  //setTimeout(detectPose, 4000);
+  
+  noseX = width / 2;
+  noseY = height / 2;
   video.hide();
   statusPrompt = createElement('h2', 'Loading...');
 
-  angleMode(DEGREES);
-  smooth();
-  noStroke();
-  modelDisplay = 0;
-
-  noseX = width / 2;
-  noseY = height / 2;
+  //background
+  background(255);
+  push();
+  texture(bg);
+  plane(windowWidth, windowHeight);
+  pop();
+  
 }
 
+function gotPoses(poses) {
+  //console.log(poses); 
+  if (poses.length > 0) {
+    pose = poses[0].pose;
+    skeleton = poses[0].skeleton;
+  }
+}
 
 function draw() {
   //the default models in the middle(when you say I love you,I miss you...)
@@ -115,6 +123,13 @@ function draw() {
     else
     rotateY(rY);
     rotateZ(90);
+  
+  if (pose) {
+  noseX = width - (pose.nose.x);
+  noseY = pose.nose.y;  
+  print("noseX="+ noseX);
+  print("noseY="+ noseY);
+     }  
   
   //draw stave here
   drawStave();
@@ -371,14 +386,16 @@ function modelReady() {
   modelListPrompt = createP('Try to say<br>I love you, I miss you, I love you more, I hate you');
 }
 
-//detect my head position
-function detectPose() {
-  poseNet.on('pose', function(results) {
-    poses = results;
-    noseX = width - (poses[0].pose.nose.x);
-    noseY = poses[0].pose.nose.y;
-  });
-}
+// //detect my head position
+// function detectPose() {
+//   poseNet.on('pose', function(results) {
+//     poses = results;
+//     noseX = width - (poses[0].pose.nose.x);
+//     noseY = poses[0].pose.nose.y;
+//      console.log("noseX="+ noseX);
+//      console.log("noseY="+ noseY);
+//   });
+// }
 
 //show model in the middle
 function gotSpeech() {
